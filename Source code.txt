@@ -1,0 +1,1220 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% MCM/ICM LaTeX Template %%
+%% 2026 MCM/ICM           %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 设定文档类型为 article，字号 12pt (MCM 标准字号)
+\documentclass[12pt]{article}
+
+% ==========================================
+% 1. 导言区 (Preamble) - 宏包与全局设置
+% ==========================================
+\makeatletter
+\renewcommand{\tableofcontents}{%
+  \section*{\centering\contentsname}%
+  \@mkboth{\contentsname}{\contentsname}%
+  \@starttoc{toc}%
+}
+\makeatother
+
+% --- 页面布局设置 ---
+\usepackage{geometry}
+\geometry{left=1in,right=1in,top=1in,bottom=1in}
+
+% --- 字体设置 ---
+\usepackage{newtxtext}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{newtxmath}
+
+% --- 图形与绘图支持 ---
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, calc}
+
+% --- 排版与格式 ---
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[nottoc]{tocbibind}
+
+% --- [修改] 首行缩进支持 ---
+\usepackage{indentfirst} % 强制章节第一段也缩进
+
+% --- 标题格式定制 ---
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+
+
+\titlespacing*{\section}{0pt}{12pt plus 4pt minus 2pt}{6pt plus 2pt minus 2pt}
+\titlespacing*{\subsection}{0pt}{12pt plus 4pt minus 2pt}{6pt plus 2pt minus 2pt}
+
+% --- 行距与段间距 ---
+\usepackage{setspace}
+\setstretch{1}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{2em} % 首行缩进 2em
+
+% --- 页眉高度修正 (解决日志警告) ---
+\setlength{\headheight}{15pt}
+
+% --- 算法环境定制 ---
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{caption}
+\captionsetup[algorithm]{singlelinecheck=false, labelfont=bf, labelsep=colon, justification=raggedright}
+
+\makeatletter
+\newcommand\fs@mcmRuled{\def\@fs@cfont{\bfseries\rmfamily}\let\@fs@capt\floatc@ruled
+  \def\@fs@pre{\hrule height 1.5pt \kern4pt}\def\@fs@mid{\kern4pt\hrule height 0.75pt \kern4pt}
+  \def\@fs@post{\kern4pt\hrule height 1.5pt}\let\@fs@iftopcapt\iftrue}
+\makeatother
+\floatstyle{mcmRuled}
+\restylefloat{algorithm}
+
+% --- 队伍信息变量 ---
+\newcommand{\Problem}{A}
+\newcommand{\Team}{2608111}
+\newcommand{\Title}{The Revealing Guide to Smartphone Battery Survival}
+
+% --- 超链接设置 ---
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
+
+% --- 页码总页数：用 LastPage，避免你现在 \pageref{LastContentPage} 未定义 ---
+\usepackage{lastpage}
+
+% --- 页眉页脚设置 ---
+\pagestyle{fancy}
+\lhead{Team \# \Team}
+\rhead{}
+\cfoot{}
+
+% ==========================================
+% Additions from continuous_soc_model_updated.tex
+% ==========================================
+\usepackage{mathtools}
+\usepackage{microtype}
+\usepackage{siunitx}
+
+% --- Added for SOC model content ---
+\sisetup{
+  per-mode=symbol,
+  separate-uncertainty=true
+}
+\newcommand{\figwidth}{0.75\textwidth}
+\newcommand{\figwidthLarge}{0.85\textwidth}
+\newcommand{\figwidthSmall}{0.45\textwidth}
+\newcommand{\SOC}{\mathrm{SOC}}
+\newcommand{\SOH}{\mathrm{SOH}}
+
+\setcounter{tocdepth}{2}
+
+
+\begin{document}
+
+% ==========================================
+% Part 0: Summary Sheet (摘要页)
+% ==========================================
+\hypersetup{pageanchor=false}
+\thispagestyle{empty}
+
+\vspace*{-16ex}
+
+\begin{center}
+    \begin{tabular}{*3{c}}
+        \parbox[t]{0.3\linewidth}{\begin{center}\textbf{Problem Chosen}\\ \Large \textcolor{red}{\Problem}\end{center}}
+        & \parbox[t]{0.3\linewidth}{\begin{center}\textbf{2026\\ MCM/ICM\\ Summary Sheet}\end{center}}
+        & \parbox[t]{0.3\linewidth}{\begin{center}\textbf{Team Control Number}\\ \Large \textcolor{red}{\Team}\end{center}} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\vspace{2ex}
+\begin{center}
+    \textbf{\Large \Title}
+\end{center}
+
+\begin{center}
+    \textbf{Summary}
+\end{center}
+
+\indent The history of batteries can be traced back over two thousand years to ancient Iraq. The Baghdad battery, an unglazed terracotta jar discovered in the capital city, was a device that use copper and iron to function. Nowadays, highly developed lithium batteries have entered all aspects of our lives, especially in the construction of modern smart phones. 
+
+\indent The point is, the heavier we are going to rely on it, the more imperative a comprehensive understanding becomes. In this paper, we develop a comprehensive mathematical physics model, the \textbf{Continuous-Time Model (CTM)}, to demonstrate the \textbf{state of charge (SOC) dynamics} and \textbf{state of health (SOH) progression} under realistic operating conditions.
+
+\indent First, we propose \textbf{three} models. We establish the \textbf{Battery Electrical Model (BEM)} based on an \textbf{Internal Resistance ($R_{\text{int}}$) circuit}. We derive an explicit analytical expression for discharge current, ensuring computational efficiency and physical intelligibility. We propose the \textbf{Proactive Consumption Model (PRCM)} to decompose system-level power demand. We map major subsystems—including heterogeneous CPU clusters, 5G/Wi-Fi communication, and display modules—into duty-cycle and utilization-based power components. This allows us to translate complex user behaviors into quantified electrical loads. To account for long-term capacity fade, the \textbf{Passive Consumption Model (PACM)} is established. This model incorporates \textbf{Arrhenius-driven calendar aging} and cycle aging. Notably, we introduce a \textbf{Lithium Plating Punishment} factor to simulate accelerated degradation during low-temperature charging, providing a robust tool for SOH prediction.
+
+\indent Next, we formally present the \textbf{Continuous-Time Model (CTM)}, by integrating the models above. Using a real-time data set, we initially adopt a \textbf{static approach} to validate our model. Unsatisfied with the fit of 0.96, we then develop a \textbf{dynamic approach}, which resulted in a better fit of 0.97, perfectly matching the target curve's shape, as well.
+Closely after, we use the CTM to calculate time-to-empty in terms of SOH, also using both the static and dynamic methods. Among all predicted data points, we selected a suitable portion to \textbf{statistically analyze its major drivers}.
+
+\indent What's more, we further explore the battery's state of health (SOH) by making full use of our \textbf{Passive Consumption Model (PACM)}, where we also take \textbf{environmental temperature} into consideration, which is caused by \textbf{season and geographic location}.
+
+\indent Finally, we perform sensitivity analysis on some of the key parameters. Recommendation are provided for both users and developers, based on our findings. We end our paper with an analysis of strengths and limitation.
+
+\vspace{1em}
+\noindent \textbf{Keywords:} Smart Phone Battery, Power Sum Framework, Continuous-Time Model of SOC, Time-to-Empty, SOH, Battery Aging, Arrhenius factor, Lithium Plating
+
+\newpage
+
+% ==========================================
+% Part 1: 目录页 (Page 1) - [紧凑模式]
+% ==========================================
+\hypersetup{pageanchor=true}
+\setcounter{page}{1}
+\rhead{Page \thepage\ of \pageref{LastPage}}
+
+{
+  \setlength{\parskip}{0pt}
+  \singlespacing
+
+  \makeatletter
+  \phantomsection
+  \pdfbookmark[1]{\contentsname}{toc}
+  \begin{center}
+    {\Large\bfseries \contentsname}
+  \end{center}
+  \vspace{0.8em}
+  \@starttoc{toc}
+  \makeatother
+}
+
+
+% ==========================================
+% Part 2: 正文内容
+% ==========================================
+
+
+\section{Introduction}
+
+\subsection{Problem Background}
+
+Smartphone battery performance often exhibits significant variability in daily use, making it
+difficult to explain using simple user intuition. Even for the same device, battery life may differ
+substantially from day to day, indicating that energy depletion is not governed by a single dominant
+factor but rather arises from the combined effects of multiple factors.
+
+From a system-level perspective, energy consumption results from the coordinated operation of
+multiple components, including computational workloads, display modules, wireless communication,
+and various functional modules scheduled by the operating system. These processes exhibit pronounced
+temporal dynamics and frequently occur simultaneously, causing system power demand to evolve
+continuously rather than remaining constant or piecewise static. Consequently, even when total usage
+time is similar, short periods of intensive activity, prolonged moderate workloads, and the cumulative
+effects of background tasks can lead to markedly different discharge behaviors.
+
+In addition to system activity, external environmental conditions and historical factors also exert
+significant influence on battery behavior. Variations in ambient temperature can alter the internal
+characteristics of the battery, while long-term usage patterns and charging habits gradually affect its
+effective capacity and response to load. These effects accumulate over time and interact with
+instantaneous power demand, making battery dynamics difficult to characterize using simple or
+purely empirical approaches.
+
+Therefore, a deeper understanding of smartphone battery drain requires a modeling framework that
+can describe time-dependent power consumption, reflect the physical behavior of the battery, and
+maintain strong interpretability. By linking system-level power demand with battery-side electrical
+behavior on a unified time scale, such a model provides a necessary foundation for characterizing the
+evolution of the state of charge and for making reliable predictions of the remaining time to empty
+under realistic operating conditions.
+
+\subsection{Restatement of the Problem}
+
+Considering the background information and constraints described in the problem statement,
+the following problems are addressed in this study:
+
+\begin{itemize}
+  \item Develop a \textbf{continuous-time governing differential equation} (or system of equations)
+  to describe the evolution of the \textbf{state of charge (SOC)} of a lithium-ion smartphone battery
+  under realistic usage conditions.
+
+  \item Extend the SOC dynamics to account for \textbf{battery aging effects} and \textbf{long-term
+  degradation}, and assess how capacity fade and the associated evolution of the
+  \textbf{state of health (SOH)} influence SOC evolution and prediction accuracy.
+
+  \item Build a structured model to decompose \textbf{system-level power consumption} into its major
+  contributing components and map the resulting power demand to battery-side electrical
+  variables required by the governing equations.
+
+  \item Create a method to predict the \textbf{remaining time-to-empty (TTE)} for different initial
+  SOC levels and usage scenarios, and identify the dominant drivers of rapid battery drain.
+
+  \item Develop a sensitivity and uncertainty analysis framework to evaluate how modeling
+  assumptions, parameter variations, and fluctuations in usage patterns affect
+  \textbf{SOC, SOH, and TTE} predictions.
+
+  \item Design a strategy to translate modeling insights into practical recommendations for
+  users and operating systems aimed at improving battery life.
+\end{itemize}
+
+
+\subsection{Our Work}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\figwidthLarge]{mind_map.jpg}
+    \caption{Flowchart of our work.}
+    \label{fig:mind_map}
+\end{figure}
+\section{Assumptions and Justifications}
+
+
+
+To simplify the problem, we make the following basic assumptions, each of which is properly
+justified.
+
+\noindent
+\textbf{Assumption 2.1.} The electrical behavior of the smartphone lithium-ion battery is 
+represented by an \textbf{Internal Resistance ($R_{\mathrm{int}}$) circuit model} consisting of 
+an open-circuit voltage source and an equivalent series resistance.
+
+\noindent
+\textbf{Justification:}
+At the time scale relevant to SOC and TTE analysis, higher-order polarization effects
+introduce only secondary influences and are therefore neglected.
+
+\noindent
+\textbf{Assumption 2.2.} The battery charging and discharging processes are continuous in
+time, and SOC is treated as a continuous and differentiable state variable.
+
+\noindent
+\textbf{Justification:}
+Under typical operating conditions, the battery charging and discharging processes
+exhibit gradual temporal variation, supporting the formulation of SOC dynamics using
+continuous-time differential equations.
+
+\noindent
+\textbf{Assumption 2.3.} The total system power consumption is decomposable into an \textbf{additive
+combination} of subsystem power components and remains approximately constant over short
+time intervals.
+
+\noindent
+\textbf{Justification:}
+Within the numerical integration window, power fluctuations exert limited influence on SOC
+evolution and can be approximated as constant for tractability.
+
+\noindent
+\textbf{Assumption 2.4.} The internal resistance of the battery is assumed to be constant
+within typical operating SOC and temperature ranges.
+
+\noindent
+\textbf{Justification:}
+Compared with variations in system power demand, resistance changes introduce only
+secondary effects on SOC and TTE prediction.
+
+\noindent
+\textbf{Assumption 2.5.} Battery aging is assumed to manifest primarily as \textbf{effective capacity
+degradation} at the system level.
+
+\noindent
+\textbf{Justification:}
+Capacity fade provides a practical and interpretable representation of dominant long-term
+aging effects without resolving microscopic mechanisms.
+
+\noindent
+\textbf{Assumption 2.6.} Variations in usage behavior, environmental conditions, and model
+parameters are bounded and statistically representable.
+
+\noindent
+\textbf{Justification:}
+This assumption ensures that variations in parameters and usage behavior remain within
+a tractable range, allowing systematic sensitivity and uncertainty analyses.
+
+\section{Notations}
+\begin{table}[H]
+    \captionsetup{skip=3pt}
+    \caption{List of symbols, their definitions, and units}
+    \label{tab:notations}
+    \centering
+    \begin{tabular*}{\textwidth}{@{\hspace{2.5em}} c @{\extracolsep{\fill}} c c}
+        \toprule
+        \textbf{Symbol} & \textbf{Definition} & \textbf{Unit} \\
+        \midrule
+        $t$ & Time & h \\
+        $SOC$ & State of charge of the battery & -- \\
+        $SOH$ & State of health of the battery & -- \\
+        $Q$ & Available electric charge in the battery & Ah \\
+        $C$ & Nominal battery capacity & Ah \\
+        $I$ & Battery current (positive during discharge) & A \\
+        $V$ & Battery voltage (terminal or open-circuit) & V \\
+        $R$ & Battery internal resistance & $\Omega$ \\
+        $P$ & Battery-side power demand & W \\
+        $\eta$ & Efficiency factor & -- \\
+        $k_{sd}$ & Self-discharge rate of the battery & h$^{-1}$ \\
+        $b$ & Coefficients of the OCV--SOC polynomial fit & V \\
+        $y$ & Aging-induced capacity loss rate & Ah$\cdot$h$^{-1}$ \\
+        $k_{base}$ & Baseline degradation coefficient in aging model & h$^{-1}$ \\
+        $k_{cal}$ & Calendar aging sensitivity factor & -- \\
+        $n$ & Cycle aging current exponent & -- \\
+        $T$ & Battery temperature & K \\
+        $E_a$ & Activation energy of degradation reactions & J$\cdot$mol$^{-1}$ \\
+        $R_g$ & Universal gas constant & J$\cdot$mol$^{-1}$K$^{-1}$ \\
+        $TTE$ & Time to empty & h \\
+        $\sigma$ & Uncertainty or standard deviation & -- \\
+        \bottomrule
+    \end{tabular*}
+\end{table}
+
+
+\section{Models Proposal}
+% ============================================================
+\subsection{Battery Electrical Model (BEM)}
+% ============================================================
+This model is proposed to establish the basic structure of the circuit contained inside a modern smart phone.
+
+\paragraph{Sign convention}
+The battery current $I(t)$ is defined to be positive during discharge, i.e., when
+electrical energy is delivered from the battery to the smartphone load. Accordingly,
+the system-level power demand satisfies $P_{\mathrm{total}}(t)\ge 0$ under normal usage.
+
+\paragraph{Internal Resistance ($R_{\mathrm{int}}$) model}
+At the time scale relevant for state-of-charge (SOC) evolution, the battery is modeled
+using a standard \textbf{Internal Resistance model ($R_{\mathrm{int}}$ model)}. This equivalent circuit consists of an open-circuit voltage source $V_{\mathrm{OC}}(\SOC)$ in series with an internal resistance $R_{\mathrm{int}}(\SOC,T)$. The terminal voltage is therefore given by
+\begin{equation}
+V_{\mathrm{cell}}\bigl(\SOC(t),T(t)\bigr)
+=
+V_{\mathrm{OC}}\!\bigl(\SOC(t)\bigr)
+-
+I(t)\,R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr).
+\label{eq:vcell}
+\end{equation}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\figwidthLarge]{\detokenize{circuit.jpg}}
+    \caption{Circuit diagram of the Rint model and comparison of voltage responses.}
+    \label{fig:rint_model}
+\end{figure}
+
+
+\paragraph{Power balance relation}
+The smartphone imposes an instantaneous electrical power demand at the battery terminals,
+which must satisfy
+\begin{equation}
+P_{\mathrm{total}}(t)
+=
+V_{\mathrm{cell}}\bigl(\SOC(t),T(t)\bigr)\, I(t).
+\label{eq:power_balance}
+\end{equation}
+
+Substituting the terminal-voltage relation into the power balance equation yields
+\begin{equation}
+P_{\mathrm{total}}(t)
+=
+\Bigl(
+V_{\mathrm{OC}}\!\bigl(\SOC(t)\bigr)
+-
+I(t)\,R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr)
+\Bigr)\, I(t).
+\label{eq:power_expand}
+\end{equation}
+
+Rearranging terms leads to a quadratic equation in the current $I(t)$:
+\begin{equation}
+R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr)\, I^2(t)
+-
+V_{\mathrm{OC}}\!\bigl(\SOC(t)\bigr)\, I(t)
++
+P_{\mathrm{total}}(t)
+=
+0.
+\label{eq:quadratic_I}
+\end{equation}
+
+\subsubsection{Second-Order OCV Approximation}
+
+To obtain a closed-form mapping from SOC to voltage, the open-circuit voltage is
+approximated by a second-order polynomial in SOC,
+\begin{equation}
+V_{\mathrm{OC}}(\SOC)
+=
+b_0
++
+b_1\,\SOC
++
+b_2\,\SOC^2,
+\label{eq:ocv_poly}
+\end{equation}
+where the coefficients $(b_0,b_1,b_2)$ are obtained by fitting voltage--SOC data using
+voltage-controlled battery models. Such low-order polynomial representations are widely
+used for SOC and SOH diagnosis and provide a good balance between accuracy and analytical
+tractability~\cite{Braun2022SOCSOH}.
+.
+
+% ----------------------------
+% OCV--SOC fitting figure
+% ----------------------------
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\figwidthSmall]{ocv_fit.png}
+  \caption{Second-order polynomial fit of the open-circuit voltage as a function of SOC.}
+  \label{fig:ocv_fit}
+\end{figure}
+
+\subsubsection{Explicit Current Expression}
+
+Solving the quadratic equation \eqref{eq:quadratic_I} using the quadratic formula gives
+\begin{equation}
+I(t)
+=
+\frac{
+V_{\mathrm{OC}}\!\bigl(\SOC(t)\bigr)
+\pm
+\sqrt{
+V_{\mathrm{OC}}^2\!\bigl(\SOC(t)\bigr)
+-
+4\,R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr)\,P_{\mathrm{total}}(t)
+}
+}{
+2\,R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr)
+}.
+\label{eq:I_roots}
+\end{equation}
+
+For discharge operation with $P_{\mathrm{total}}(t)>0$ and $R_{\mathrm{int}}>0$, the
+physically meaningful solution satisfies
+$0<I(t)<V_{\mathrm{OC}}/R_{\mathrm{int}}$ and corresponds to the negative branch of the
+square root. The resulting \textbf{explicit current expression} is therefore
+\begin{equation}
+I(t)
+=
+\frac{
+V_{\mathrm{OC}}\!\bigl(\SOC(t)\bigr)
+-
+\sqrt{
+V_{\mathrm{OC}}^2\!\bigl(\SOC(t)\bigr)
+-
+4\,R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr)\,P_{\mathrm{total}}(t)
+}
+}{
+2\,R_{\mathrm{int}}\!\bigl(\SOC(t),T(t)\bigr)
+}.
+\label{eq:I_explicit}
+\end{equation}
+% ============================================================
+\subsection{Proactive Consumption Model (PRCM)}
+% ============================================================
+
+Smartphone usage is inherently proactive, so we define the energy associated with
+normal operation as proactive consumption. The \textbf{Proactive Consumption Model (PRCM)}
+computes the total system power demand.
+
+To relate system-level power demand to battery discharge, we introduce an overall
+power-conversion efficiency parameter $\eta\in(0,1]$, which accounts for losses in
+the PMIC and DC--DC conversion stages. We distinguish between the system-side power
+consumption $P_{\mathrm{sys}}(t)$ and the effective battery-side power demand
+$P_{\mathrm{total}}(t)$. The latter, which enters the battery and SOC models, is given by
+\begin{equation}
+P_{\mathrm{total}}(t)
+=
+\frac{1}{\eta}\,
+P_{\mathrm{sys}}(t).
+\end{equation}
+
+The system-side power consumption is decomposed into a baseline term and incremental
+contributions from major subsystems:
+\begin{equation}
+P_{\mathrm{sys}}(t)
+=
+P_0
++ \Delta P_{\mathrm{CPU}}(t)
++ \Delta P_{\mathrm{WiFi}}(t)
++ \Delta P_{\mathrm{GNSS}}(t)
++ \Delta P_{\mathrm{Screen}}(t)
++ \Delta P_{\mathrm{5G}}(t)
++ \Delta P_{\mathrm{Audio}}(t).
+\end{equation}
+
+The baseline power $P_0$ represents the near-idle power floor (screen off, no explicit
+interaction) and aggregates essential idle costs:
+\begin{equation}
+P_0
+=
+\sum_{k\in K} P_{k,\mathrm{idle}}
++ P_{\mathrm{SL}}
++ P_{\mathrm{idle}}
++ P_{\mathrm{static}}.
+\end{equation}
+
+Here, $k\in K$ indexes CPU clusters and $P_{k,\mathrm{idle}}$ is the powered-idle cost of
+cluster $k$. $P_{\mathrm{SL}}$ denotes wireless standby power, $P_{\mathrm{idle}}$ captures
+connectivity-related idle costs, and $P_{\mathrm{static}}$ collects device-level static
+overheads (e.g., memory retention and always-on services).
+
+Even in apparent idle states, baseline power persists due to OS activity and periodic
+wakelocks. A partial CPU wakelock draws about $0.09~\mathrm{W}$~\cite{Pathak2012Eprof}.
+Since true standby does not require continuous wakelocks, we conservatively set
+\begin{equation}
+P_0 = 0.1~\mathrm{W}.
+\end{equation}
+
+\medskip
+\noindent \textbf{CPU Power} \\
+Modern SoCs use heterogeneous multi-core CPUs organized into clusters with different
+operating ranges. We model CPU power at the cluster level.
+
+For each CPU cluster $k\in K$, the activity-dependent component is approximated using
+a first-order utilization model:
+\begin{equation}
+\Delta P_{\mathrm{CPU}}(t)=\sum_{k\in K}\alpha_k\,u_k(t),
+\end{equation}
+where $u_k(t)\in[0,1]$ is the utilization of cluster $k$, and $\alpha_k$ is the marginal
+power from idle to full load.
+
+We adopt a three-cluster configuration,
+\[
+K=\{L,M,B\},
+\]
+corresponding to the efficiency, middle, and performance clusters. For two-cluster
+platforms, the model reduces to $K=\{L,B\}$.
+
+\medskip
+\noindent \textbf{Wi-Fi Power} \\
+At the system level, Wi-Fi power is mainly determined by the active communication duty
+cycle. We use a simplified duty-cycle model:
+\begin{equation}
+\Delta P_{\mathrm{WiFi}}(t)
+=
+D_{\mathrm{WiFi}}(t)\,
+\bigl(P_{\mathrm{WiFi,ac}}-P_{\mathrm{WiFi,id}}\bigr),
+\end{equation}
+where $D_{\mathrm{WiFi}}(t)\in[0,1]$ is the long-term average active duty cycle and
+$P_{\mathrm{WiFi,id}}$ is absorbed into $P_0$.
+
+The active duty cycle is approximated via the long-term average throughput
+$\overline R(t)$:
+\begin{equation}
+D_{\mathrm{WiFi}}(t)
+=
+\min\!\left(
+1,\,
+\frac{\overline R(t)}{R_{\mathrm{eff}}}
+\right),
+\end{equation}
+where $R_{\mathrm{eff}}$ is an effective rate accounting for protocol and MAC overhead.
+
+\medskip
+\noindent \textbf{GNSS Power} \\
+GNSS operates intermittently; deep-sleep consumption is absorbed into $P_0$, and only
+the incremental active cost is modeled.
+
+Consider a time window $[t,t+\Delta]$. Let $t_{\mathrm{ac}}(t)$ be the total time within
+this window during which GNSS is active. The GNSS activity duty cycle is defined as
+\begin{equation}
+D_{\mathrm{GNSS}}(t)=\frac{t_{\mathrm{ac}}(t)}{\Delta}\in[0,1].
+\end{equation}
+Assuming the GNSS active-state power is approximately constant and denoted by
+$P_{\mathrm{GNSS,ac}}$, the time-averaged incremental GNSS power over the window is
+\begin{equation}
+\Delta P_{\mathrm{GNSS}}(t)\approx D_{\mathrm{GNSS}}(t)\,P_{\mathrm{GNSS,ac}}.
+\end{equation}
+
+To capture weak-signal overhead without explicit environment modeling, we apply a
+multiplicative perturbation:
+\begin{equation}
+P_{\mathrm{GNSS,ac}} \mapsto (1+\delta)\,P_{\mathrm{GNSS,ac}},
+\qquad \delta\in[0,0.5].
+\end{equation}
+Therefore,
+\begin{equation}
+\Delta P_{\mathrm{GNSS}}(t)=D_{\mathrm{GNSS}}(t)\,(1+\delta)\,P_{\mathrm{GNSS,ac}}.
+\end{equation}
+
+\medskip
+\noindent \textbf{Screen Power} \\
+Display power is dominated by refresh-dependent driving losses and brightness-dependent
+luminous output. We use a first-order incremental model.
+
+Let $f(t)$ denote the refresh rate (Hz), $B(t)\in[0,1]$ the normalized user brightness
+level, and $APL(t)\in[0,1]$ the average picture level (average pixel intensity).
+Since static display losses are absorbed into the baseline power $P_0$, we model the
+incremental screen power as
+\begin{equation}
+\Delta P_{\mathrm{Screen}}(t)
+=
+\gamma_{\mathrm{scr}}\, f(t)
++
+\alpha_{\mathrm{scr}}\, B(t)\, APL(t),
+\end{equation}
+where $\gamma_{\mathrm{scr}}$ and $\alpha_{\mathrm{scr}}$ are device-dependent coefficients.
+For LCD screens, one may approximate $APL(t)\approx 1$.
+
+\medskip
+\noindent \textbf{5G Power} \\
+We model only the incremental 5G power above $P_0$. In the active radio state, the cost
+includes an active baseline, a throughput-dependent term, and a signal-quality penalty.
+
+Let $D_{\mathrm{5G}}(t)\in[0,1]$ be the fraction of time the modem stays in an active radio state
+within a short averaging window. The incremental 5G power is modeled as
+\begin{equation}
+\Delta P_{\mathrm{5G}}(t)
+=
+D_{\mathrm{5G}}(t)\Big(
+P_{\mathrm{5G,base}}
++
+\beta_{\mathrm{5G}}\,R(t)
++
+\gamma_{\mathrm{5G}}\,\phi\!\big(S(t)\big)
+\Big),
+\end{equation}
+where $P_{\mathrm{5G,base}}$ is the active baseline power of the 5G subsystem,
+$R(t)$ is the data rate (Mbps), and $\phi(S)\ge 0$ is a monotone penalty for poor signal quality.
+
+To avoid unit inconsistency and sign ambiguity, we map the raw signal indicator $S(t)$
+(e.g., RSSI/RSRP in dBm) into a nonnegative penalty:
+\begin{equation}
+\phi\!\big(S(t)\big)
+=
+\max\!\bigl(0,\ S_{\mathrm{ref}}-S(t)\bigr),
+\end{equation}
+where $S_{\mathrm{ref}}$ is a reference signal level.
+
+\medskip
+\noindent \textbf{Audio Power} \\
+Audio power is mainly determined by whether the audio processing chain is active; when
+no audio is played, the incremental audio cost is negligible.
+
+Let $a(t)\in[0,1]$ denote the audio activity indicator, where $a(t)=1$ when audio is being
+played (e.g., music, video sound, voice call) and $a(t)=0$ otherwise. Assuming an
+approximately constant average power $P_A$ during audio playback,
+\begin{equation}
+\Delta P_{\mathrm{Audio}}(t)=a(t)\,P_A.
+\end{equation}
+In long-term average analysis, $a(t)$ can also be interpreted as the fraction of time
+during which audio playback is active.
+
+% ============================================================
+\subsection{Passive Consumption Model (PACM)}
+% ============================================================
+\subsubsection{Model introduction}
+Despite the proactive consumption, we also have a kind of passive consumption on a larger time scale, that is \textbf{battery aging}. Different actively used battery, this part of consumption is permanent, and is related to the battery life. Despite the small effects that passive consumption can have on each charging cycle, it still accumulates, therefore cannot be neglect if we want to build the rigorous Continuous-Time Model of SOC.
+\subsubsection{Dynamic of Model}
+A stress-accumulation representation
+is employed in which the total aging stress is decomposed into additive calendar-aging
+and cycling-aging components.
+The instantaneous capacity fade rate $y(t)$ (in $10^{-6}$ mAh/s) is defined by the following system of equations:
+	
+	\begin{equation}
+		y(t) = k_{\text{base}} \cdot \left[ R_{\text{cal}}(t) + R_{\text{cyc}}(t) \right] .
+	\end{equation}
+	
+	Where the calendar aging component $R_{\text{cal}}(t)$ and the cycling aging component $R_{\text{cyc}}(t)$ are formulated as:
+	
+	\begin{align}
+		R_{\text{cal}}(t) &= f_T \cdot \left[ 1 + 0.6 \cdot (SOC(t) - 0.5) \right] ,\\
+		R_{\text{cyc}}(t) &= f_T \cdot |I(t)|^{1.3} \cdot P(t, T_k).
+	\end{align}
+	Where we take 0.6 as the calendar sensitivity factor $k_{cal}$ and
+1.3 as the cycle current factor $n$.The temperature-dependent Arrhenius factor $f_T$ is given by:
+	
+	\begin{equation}
+		f_T = \exp \left( -\frac{E_a}{R} \left( \frac{1}{T_k} - \frac{1}{T_{\text{ref}}} \right) \right),
+	\end{equation}
+    which is widely used in thermal and electrochemical degradation models for Li-ion batteries.
+    And we take the activation energy of side reactions $E_a$ to be 135kJ/mol
+    \cite{Hatchard2001ThermalOvercharge}.
+    \paragraph{Inverse engineering calibration of $k_{\text{base}}$}
+The baseline degradation coefficient $k_{\text{base}}$ is determined via an inverse
+engineering approach such that an \textit{Optimized} usage scenario reaches an
+End-of-Life (EoL) threshold of $20\%$ capacity loss at day $500$.
+This definition is aligned with industry-style battery health criteria, which commonly associate EoL with approximately $80\%$ remaining capacity
+\cite{Apple101575}.
+\subsubsection{Lithium Plating Punishment}
+    In a Li-ion battery, normal charging inserts $\mathrm{Li^+}$ into the graphite anode (intercalation). At low temperature, charge-transfer kinetics and solid-state diffusion slow down, increasing anode polarization. Under high charge current, the anode surface potential can approach or drop below the $\mathrm{Li/Li^+}$ equilibrium potential, enabling the side reaction
+\[
+\mathrm{Li^+ + e^- \rightarrow Li^0}
+\]
+and depositing metallic lithium on the anode surface (lithium plating). Plating consumes lithium and promotes SEI growth, leading to capacity fade and higher impedance; non-uniform deposits can also increase the risk of dendrite formation and internal short circuits.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\figwidthSmall]{Lithium Plating.png}
+  \caption{Lithium Plating.}
+  \label{fig:Lithium Plating}
+\end{figure}
+	To account for the accelerated degradation caused by lithium plating under low-temperature charging conditions, a non-linear penalty factor $P$ is introduced:
+	
+	\begin{equation}
+		P = \begin{cases} 
+			\exp\left(0.12 \cdot (288.15 - T_k)\right) \cdot (|I| + 0.5), & \text{if } I > 0 \text{ and } T_k < T_{onset}. \\
+			1.0, & \text{otherwise}.
+		\end{cases}
+	\end{equation}
+	Where we take the $T_{onset} $ as 288.15K \cite{Yang2017FastCharging}.
+% ============================================================
+
+\section{Continuous-Time Model of SOC (CTM)}
+Finally, now we can complete the full version of \textbf{Continuous-Time Model of SOC (CTM)},by integrating the three models together: the \textbf{PRCM}, \textbf{PACM} and \textbf{BEM}.
+\paragraph{Starting point: \textbf{charge conservation} and \textbf{Coulomb counting}}
+Let $Q(t)$ denote the available charge in the cell (in $\si{A.h}$), and define the state of
+charge as
+\begin{equation}
+\SOC(t)=\frac{Q(t)}{C_0},
+\label{eq:soc_def}
+\end{equation}
+where $C_0$ is the nominal capacity (in $\si{A.h}$).
+
+Under the sign convention that $I(t)>0$ during discharge, the net charge depletion is
+attributed to three mechanisms: (i) external load discharge with Coulombic efficiency,
+(ii) self-discharge modeled by a first-order rate constant, and (iii) an aging-induced
+equivalent charge-loss term. Accordingly, the charge balance is written as
+\begin{equation}
+\frac{dQ(t)}{dt}
+= -\frac{I(t)}{\eta_c} - Q(t)\,k_{\mathrm{sd}} - y(t),
+\label{eq:charge_balance}
+\end{equation}
+where $\eta_c$ is the Coulombic efficiency, $k_{\mathrm{sd}}$ is the self-discharge rate,
+and $y(t)$ denotes the aging-induced equivalent charge-loss rate.
+
+\paragraph{From charge balance to SOC dynamics}
+Dividing \eqref{eq:charge_balance} by $C_0$ and using $Q(t)=C_0\,\SOC(t)$ yields
+\begin{equation}
+\frac{d\,\SOC(t)}{dt}
+= -\left( \frac{I(t)}{C_0\,\eta_c} + k_{\mathrm{sd}}\,\SOC(t) \right)
+- \frac{y(t)}{C_0}.
+\label{eq:soc_full_exact}
+\end{equation}
+
+\paragraph{Parameter settings}
+We set
+\begin{equation}
+\eta_c=0.995, \qquad
+C_0=4.5\ \si{A.h}, \qquad
+k_{\mathrm{sd}}=\frac{0.005}{30\times 24}\ \si{h^{-1}},
+\end{equation}
+corresponding to a representative self-discharge rate of $0.5\%/\text{month}$.
+These values lie within the typical parameter ranges reported for Li-ion battery packs
+and are consistent with commonly adopted engineering models
+\cite{Feng2019Inconsistency}.
+
+The battery internal resistance is modeled as a constant,
+$R_{\mathrm{int}} = R_0 = 50~\si{m\ohm}$, consistent with typical values reported for
+consumer lithium-ion batteries \cite{Plett2015BMS}.
+
+% =========================
+% Fully Closed SOC Model (time in hours)
+% =========================
+\subsection{Fully Closed SOC Model}
+
+\paragraph{Units and variable definitions}
+In this subsection, time $t$ is measured in hours and $\SOC(t)$ is dimensionless.
+The temperature $T(t)$ is in Kelvin (K), and the total power demand $P_{\mathrm{total}}(t)$ is in watts (W).
+The open-circuit voltage $V_{\mathrm{OC}}(\SOC)$ is in volts (V), and the internal resistance is in ohms ($\Omega$).
+Accordingly, the current $I(t)$ is obtained in amperes (A) from the power inversion formula.
+
+% ----- OCV-SOC polynomial -----
+\begin{equation}
+V_{\mathrm{OC}}\!\big(\SOC(t)\big)
+=
+3.34285
++0.990796\,\SOC(t)
+-0.186602\,\SOC^2(t).
+\label{eq:ocv_numeric}
+\end{equation}
+
+% ----- Current from power inversion (R_int = 0.05 Ohm) -----
+\begin{equation}
+I(t)=
+\frac{
+V_{\mathrm{OC}}\!\big(\SOC(t)\big)
+-\sqrt{
+V_{\mathrm{OC}}^2\!\big(\SOC(t)\big)
+-0.2\,P_{\mathrm{total}}(t)
+}
+}{
+0.1
+}.
+\label{eq:I_explicit_fixed}
+\end{equation}
+
+% ----- Arrhenius factor (Ea=135000 J/mol, R=8.314 J/mol/K, Tref=298.15 K) -----
+\begin{equation}
+f_T(T)
+=\exp\!\left[
+-16241.3\left(\frac{1}{T}-\frac{1}{298.15}\right)
+\right].
+\label{eq:arrhenius_fixed}
+\end{equation}
+
+% ----- Lithium-plating penalty (Tonset=288.15 K) -----
+\begin{equation}
+P(I,T)=
+\begin{cases}
+\exp\!\big(0.12\,(288.15-T)\big)\,\big(|I|+0.5\big),
+& I>0 \text{ and } T<288.15,\\[4pt]
+1.0, & \text{otherwise}.
+\end{cases}
+\label{eq:penalty_fixed}
+\end{equation}
+
+% ----- SOC ODE (time in hours) -----36e-4 by 0.22336 to keep consistency.
+\begin{equation}
+\begin{aligned}
+\frac{d\,\SOC(t)}{dt}
+% Note: If $C_0$ is expressed in mAh and $I(t)$ in mA, the prefactor 1/(C_0\eta_c) is 2.2336e-4.
+% If using SI units (Ah, A), replace 2.23
+= -\Bigg[
+&\left(2.2336\times10^{-4}\right) I(t)
++\left(6.944\times10^{-6}\right)\SOC(t)
+\\[4pt]
+&\quad
++\left(2.88\times10^{-8}\right)\,
+f_T\!\big(T(t)\big)\,
+\Big(1+0.6\,(\SOC(t)-0.5)\Big)
+\\[4pt]
+&\quad
++\left(2.88\times10^{-8}\right)\,
+f_T\!\big(T(t)\big)\,
+\big|I(t)\big|^{1.3}\,
+P\!\big(I(t),T(t)\big)
+\Bigg].
+\end{aligned}
+\label{eq:soc_ode_all_numeric}
+\end{equation}
+
+% ============================================================
+\subsection{Data-driven Validation}
+\label{subsec:validation}
+% ============================================================
+
+To verify the empirical validity of the proposed continuous-time SOC model, we conduct a data-driven validation using a real-world smartphone battery dataset provided by the GreenHub Project \cite{greenhub}.
+The dataset contains minute-level measurements of battery state, system power consumption, and environmental conditions collected from consumer smartphones.
+
+\subsubsection{Dataset and preprocessing}
+Each record corresponds to one minute and includes the device brand, nominal battery capacity, measured SOC, system power consumption, and temperature.
+In this study, we select a representative device group and extract a continuous 24-hour window (1440 minutes) as the validation horizon.
+All variables are converted into model-consistent units: time in hours, power in watts, temperature in Kelvin, and SOC dimensionless.
+The nominal capacity is converted as $C_0=\texttt{capacity\_mah}/1000$ (Ah), and the initial condition is set to the first measured SOC value.
+
+\subsubsection{Static Validation methodology}
+First, a \textbf{static averaged-parameter validation} is conducted to assess macroscopic consistency.
+The measured power consumption and temperature over the 24-hour window are replaced by their time averages, yielding a \textbf{scalar ordinary differential equation} with constant parameters.
+Solving this equation produces a smooth theoretical discharge trajectory that reflects the long-term SOC trend (fig2 left).
+\subsubsection{Dynamic Validation methodology}
+\textbf{However}, we then realized that this is not the case, because the Power of the phone is varying at every moment. This triggers our thinking of a \textbf{dynamic approach}. 
+At each minute, the open-circuit voltage is computed from the \textbf{fitted SOC--voltage relation}, the discharge current is obtained by explicit inversion of the \textbf{power balance equation}, and SOC is updated using a \textbf{one-step explicit discretization} (fig2 right).
+Since the present formulation focuses on discharge behavior, charging intervals are identified by increases in measured SOC and are excluded from validation by synchronizing the predicted SOC to the measured value.
+
+\paragraph{Evaluation metrics}
+Model accuracy is quantified using standard error metrics.
+Let $SOC_{\mathrm{data}}(t_k)$ denote the measured SOC at minute $k$ and $SOC_{\mathrm{pred}}(t_k)$ the corresponding prediction from the dynamic validation.
+We report the mean absolute error (MAE) and root mean square error (RMSE):
+\begin{align}
+\mathrm{MAE} &= \frac{1}{N}\sum_{k=1}^{N} \left| SOC_{\mathrm{pred}}(t_k) - SOC_{\mathrm{data}}(t_k) \right|,\\
+\mathrm{RMSE} &= \sqrt{\frac{1}{N}\sum_{k=1}^{N} \left( SOC_{\mathrm{pred}}(t_k) - SOC_{\mathrm{data}}(t_k) \right)^2 }.
+\end{align}
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=4.5cm,keepaspectratio]{soc_static_compare.png}\hfill
+\includegraphics[height=4.5cm,keepaspectratio]{soc_dynamic_compare.png}
+\caption{SOC validation results for a Google device: dynamic minute-level validation (left) and averaged-parameter validation (right).}
+\label{fig:soc_validation}
+\end{figure}
+
+\subsubsection{Results and discussion}
+
+Figure~\ref{fig:soc_validation} shows that the proposed model reproduces the measured SOC decay over a 24-hour period with a \textbf{mean absolute error of $3.10\%$} under dynamic, minute-level validation.
+The prediction error remains bounded without \textbf{cumulative drift}, indicating \textbf{numerical stability}.
+A slight overestimation of SOC is observed during the mid-discharge stage, which can be attributed to simplified resistance modeling and the exclusion of transient effects.
+The averaged-parameter validation further confirms that the closed-form SOC dynamics preserve the correct long-term discharge trend, supporting the applicability of the model for system-level battery analysis.
+
+\section{Time-to-empty Prediction} 
+
+\subsection{Model Overview}
+\subsection{Model Details}
+Let Time-to-Empty time be TTE, then it can be expressed in the following form:
+\begin{equation}
+    TTE =\frac{SOC(t)}{\frac{dSOC}{dt}},
+\end{equation}
+we can know from the last part, that this indicates a nonlinear differential equation. Similarly, we can come up with two different versions of prediction. The static one, where we take \textbf{P} and \textbf{T} as a fixed average value. And also the dynamic one, where we are informed with the real-time data of the \textbf{P(t)} and \textbf{T(t)}.
+The full version of TTE expression can be derived rom equation (62):
+\begin{equation}
+TTE = \frac{SOC(t)}{\displaystyle \frac{I(t)}{C_{0} \cdot \eta_c} + k_{sd}\cdot SOC(t) + f_T \cdot \left[ k(1 + \gamma(SOC(t) - 0.5)) + |I|^{1.3} \right]}.
+\end{equation}
+Closely after,we calculated the uncertainty of the predicted data:
+\begin{equation}
+\sigma_{TTE} = \sqrt{ \left( \frac{\partial TTE}{\partial P} \sigma_P \right)^2 + \left( \frac{\partial TTE}{\partial T} \sigma_T \right)^2 + \left( \frac{\partial TTE}{\partial C_{0}} \sigma_C \right)^2 + \left( \frac{\partial TTE}{\partial soc} \sigma_{soc} \right)^2 }.
+\end{equation}
+Where:
+\begin{equation}
+\frac{\partial TTE}{\partial x_i} = \begin{cases} 
+\frac{1}{\dot{soc}} + soc \cdot \frac{\partial (1/\dot{soc})}{\partial soc}, & x_i = soc. \\
+soc \cdot \left( -\frac{1}{\dot{soc}^2} \right) \frac{\partial \dot{soc}}{\partial x_i}, & x_i \in \{P, T, C_{0}\}.
+\end{cases}
+\end{equation}
+The two different versions of results are shown in Figure~\ref{fig:tte_compare}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=4.5cm,keepaspectratio]{time_to_empty_prediction_static.png}\hfill
+  \includegraphics[height=4.5cm,keepaspectratio]{time_to_empty_prediction_dynamic.png}
+  \caption{Two complementary TTE validation views: dynamic minute-level prediction with uncertainty bounds (left) and static prediction under averaged power with an uncertainty band (right).}
+  \label{fig:tte_compare}
+\end{figure}
+
+
+The model tends to perform better when SOC is high and the predicted TTE is low.
+A plausible explanation is a scaling effect: uncertainty in TTE naturally amplifies when the discharge rate is small.
+The reduced uncertainty at low SOC is also consistent with the convergence of SOC(t) toward zero.
+
+
+\subsection{Model Evaluation}
+To evaluate the significance of the prediction, we targeted a specific range of data. This region is defined by a State of Charge (SOC) exceeding $40\%$ but a predicted Time to Empty (TTE) of less than $20$ hours. This represents intensive discharge conditions where the battery is nearly full, yet the remaining time is truncated due to high power demand.
+
+By segmenting the TTE range $[0, 20]$ into four intensity bands---Extreme Load ($0$--$5$h), Heavy Load ($5$--$10$h), Moderate Load ($10$--$15$h), and Light Load ($15$--$20$h)---we can observe how the model's discharge rate $\dot{SOC}$ responds to different system-level feature combinations.
+This approach allows us to verify if the physical model’s prediction of low remaining time is consistently driven by observable high-drain activities. Shown below is the selected data(Figure 4) and statistical analysis.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\figwidth]{tte_high_soc_low_tte_roi.png}
+  \caption{Distribution of high-SOC but low-TTE samples within the selected region of interest (ROI), grouped by TTE intensity bands.}
+  \label{fig:tte_highsoc_lowtte_roi}
+\end{figure}
+\begin{table}[H]
+\centering
+\label{tab:tte_analysis}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{TTE Range (Hours)} & \textbf{0--5h} & \textbf{5--10h} & \textbf{10--15h} & \textbf{15--20h} \\
+\midrule
+Stress Level & \textit{Extreme} & \textit{Heavy} & \textit{Moderate} & \textit{Light} \\
+Sample Count ($N$) & 4 & 106 & 145 & 142 \\
+Avg. Temperature ($^\circ$C) & 28.43 & 28.59 & 27.25 & 27.24 \\
+Avg. Screen Brightness (0-1) & 0.7 & 0.6 & 0.6 & 0.5\\
+Network Type (Mode) & 4G & 4G & WiFi & WiFi \\
+Network Active (\%) & 100.0\% & 72.6\% & 55.9\% & 38.0\% \\
+GPS Enabled (\%) & 0.0\% & 10.4\% & 11.7\% & 16.9\% \\
+Avg. CPU Load (\%) & 0.9\% & 0.5\% & 0.4\% & 0.3\% \\
+\bottomrule
+\end{tabular}
+\caption{System Feature Statistics}
+\end{table}
+
+From the results we can conclude that \textbf{Screen Brightness} and \textbf{CPU load} are \textbf{vital} factors that caused the battery to drain out rapidly, the affection of \textbf{Network} is moderate, while \textbf{GPS} accounts little.
+We can also see that \textbf{Temperature} doesn't varies a lot in this scenery, So we can not really gain an effective conclusion based on T.
+
+However, in our next discussion, when we expand our time scale larger, and when the aging factor from our proposed model PACM begins to kick in, T becomes a vital factor.
+
+\section{Extension on State of Health (SOH)} 
+In this section, we will discuss about the state of health of battery.
+
+The State of Health (SOH) of a lithium-ion battery is a critical metric that characterizes its ability to store and deliver energy relative to its initial conditions. Unlike State of Charge (SOC), which fluctuates daily, SOH represents a permanent, irreversible degradation of battery capacity over time. 
+
+Predicting SOH is essential for determining the End of Life (EoL) of a device---typically defined as the point when the battery's maximum capacity drops below $80\%$ of its nominal value. Battery degradation is driven by complex electrochemical processes, including the growth of the Solid Electrolyte Interphase (SEI) layer and lithium plating. 
+
+Our proposed model PACM can simulate this process on a large time scale.The design logic and approach can be seen in the model propose part. Here we define four kinds of usage scenarios:
+\begin{description}
+    \item[\textbf{Heavy User (1.4 Ah/day, 100\% Limit):}] Represents power users (e.g., gamers, heavy media consumers) with an intensive daily throughput of 1.4 Ah and unrestricted charging up to 100\% State of Charge (SOC). This scenario exposes the battery to maximum cycle stress and high-voltage calendar aging.
+    
+    \item[\textbf{Standard User (0.9 Ah/day, 100\% Limit):}] Serves as the baseline profile, reflecting the average smartphone user's daily energy consumption (0.9 Ah) with conventional overnight charging to 100\% capacity.
+    
+    \item[\textbf{Optimized User (0.9 Ah/day, 80\% Limit):}] Shares the same daily workload as the Standard profile (0.9 Ah/day) but actively restricts the maximum charging threshold to 80\%. This scenario is designed to test the effectiveness of software-based "smart charging" algorithms in mitigating high-voltage degradation.
+    
+    \item[\textbf{Light User (0.4 Ah/day, 100\% Limit):}] Represents low-frequency usage patterns (e.g., secondary devices or elderly users) with a minimal daily throughput of 0.4 Ah, focusing primarily on calendar aging effects rather than cycle fatigue.
+\end{description}
+To maintain computational feasibility while preserving physical accuracy, the following assumptions are made:
+\begin{enumerate}
+    \item \textbf{Thermal Equilibrium:} The battery temperature is the sum of a seasonally fluctuating ambient temperature ($20^\circ\text{C} \pm 15^\circ\text{C}$) and a fixed internal heat rise generated during operation (e.g., $+8^\circ\text{C}$ during charging).
+    \item \textbf{Uniform SEI Growth:} The primary degradation mechanism is assumed to be the consumption of lithium due to SEI layer thickening.
+\end{enumerate}
+
+
+Here is our final simulation result:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\figwidthLarge]{soh_500day_usage_scenarios.png}
+  \caption{Evolution of battery State of Health (SOH) over a 500-day period under different usage intensity and charging strategy scenarios.}
+  \label{fig:soh_usage_scenarios}
+\end{figure}
+
+Furthermore, geographic location can be incorporated as an external factor that influences ambient temperature, which is indirectly distinguished by latitude.
+By integrating this effect into the proposed aging-aware model, we obtain the long-term battery health prediction at a two-year timescale, as shown in Figure 9.
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\figwidthLarge]{two years analysis.png}
+  \caption{Two-year battery SOH analysis incorporating geographic temperature variation and daily usage intensity.}
+  \label{fig:soh_geography_usage_2yr}
+\end{figure}
+
+
+\section{Sensitivity Analysis}
+\subsection{Proactive Discharge Dynamics}
+This section examines the sensitivity of key parameters governing the instantaneous discharge rate of the battery during active usage.
+
+\begin{itemize}
+
+    \item \textbf{Coulonmbic Efficiency ($\eta_c$)}
+    \begin{itemize}
+        \item Reflects the effectiveness of charge transfer and accounts for parasitic losses (e.g. electrolyte oxidation) during the discharge process.
+        \item Even a minor decrease in $\eta_c$ (e.g., $0.995 \rightarrow 0.985$) applies a linear scaling to the $dSOC/dt$ slope. This results in a cumulative error where the predicted SOC consistently overestimates the actual remaining capacity over a 10-hour cycle.
+    \end{itemize}
+
+    \item \textbf{Nominal Internal Resistance ($R_{int}$)}
+    \begin{itemize}
+        \item The baseline impedance of the battery. It dictates the IR voltage drop under load.
+        \item High $R_{int}$ values create a \textbf{nonlinear positive feedback loop} under heavy loads (e.g.$P_{total} > 4W$). To maintain constant power, the model predicts a higher current $I(t)$, leading to an accelerated collapse of SOC rather than a linear decline.
+    \end{itemize}
+
+    \item \textbf{Self-discharge Rate ($k_{sd}$)}
+    \begin{itemize}
+        \item Accounts for internal micro-shorts or electronic leakage across the separator.
+        \item This parameter acts as a static offset. It dominates predictions during idle or screen-off states. An elevated $k_{sd}$ predicts a noticeable percentage drop (e.g. 2-3\%) during overnight standby, reflecting poor battery health or manufacturing defects.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Aging Correction}
+This section evaluates parameters that define the permanent loss of capacity over time and usage stress.
+
+\begin{itemize}
+    \item \textbf{Calendar Sensitivity Factor ($k_{cal}=0.6$)}
+    \begin{itemize}
+        \item Represents the electrochemical instability at high potentials, specifically the accelerated growth of the SEI layer when the battery is near 100\% SOC.
+        \item Increasing this factor differentiates the degradation between users. It predicts that a heavy user will see their SOH drop twice as fast as a user who maintains the SOC around 50\%.
+    \end{itemize}
+
+    \item {\textbf{Cycle Current Factor} (Exponent n=1.3)}
+    \begin{itemize}
+        \item Reflects the mechanical fatigue and particle cracking within the electrode material caused by high-rate lithium intercalation/de-intercalation.
+        \item Increasing this exponent (e.g. to 1.5) nonlinearly penalizes heavy usage. It predicts a significantly shorter lifespan for users frequenting fast charging or high-performance gaming, moving the capacity failure months earlier.
+    \end{itemize}
+
+    \item \textbf{Activation Energy ($E_a$)}
+    \begin{itemize}
+        \item The energy barrier required to trigger chemical degradation reactions.
+        \item In physical chemistry, a single degradation mechanism follows a stable $E_a$. A \textbf{reduction in effective $E_a$} indicates the \textbf{emergence of diverse side reactions} (e.g. electrolyte oxidation, transition metal dissolution, or lithium plating). These additional pathways lower the overall energy barrier, making the battery "chemically fragile" across all temperatures. Increasing the degrading of SOH.
+    \end{itemize}
+\end{itemize}
+\section{Recommendation}
+Based on the quantitative insights derived from the Continuous-Time Model (CTM) and the State of Health (SOH) simulation, we offer the following recommendations for users and system developers.
+\subsection{For Smartphone Users}
+\begin{itemize}
+    \item \textbf{High-Impact Behavior Modification:} Our driver analysis (Table 1) identifies screen brightness and CPU-intensive workloads as the dominant drivers of battery depletion. Users should utilize "Auto-Brightness" and close unnecessary background high-performance tasks to minimize the $\Delta P_{\text{Screen}}$ and $\Delta P_{\text{CPU}}$ components.
+    \item \textbf{Strategic Network Selection:} In weak signal areas, the 5G modem incurs a heavy signal-quality penalty $\phi(S)$ (Eq. 21). Switching to Wi-Fi or enabling Airplane Mode in dead zones can extend Time-to-Empty (TTE) by up to 15-20\%.
+    \item \textbf{Thermal and Charging Discipline:} To mitigate permanent capacity fade, users should avoid fast charging in cold environments. The Arrhenius factor $f_T$ in our PACM model (Eq. 26) shows that aging accelerates exponentially with temperature. Implementing an 80\% charging cap can extend the battery's service life from 500 days to over 800 days.
+\end{itemize}
+
+\subsection{For Operating System (OS) Designers}
+\begin{itemize}
+    \item \textbf{Dynamic Resource Scheduling:} The OS should implement SOH-aware scheduling, favoring efficiency clusters ($L$-clusters) more aggressively as the battery ages to reduce the internal heat rise ($\Delta T$) and resistive losses ($I^2 R_{\text{int}}$).
+    \item \textbf{Predictive Power Management:} Utilizing the TTE uncertainty framework (Eq. 41), the OS can provide users with a safety range prediction rather than a single percentage, helping users plan charging intervals more reliably under fluctuating workloads.
+    \item \textbf{Environmental Adaptation:} As shown in our geographic analysis (Figure 6), devices in cold regions suffer faster lithium plating. The OS could automatically trigger extra tasks in CPU loading on purpose to balance environmental temperature, as we believe SOC is worth sacrificing for SOH in the long run.
+     \item \textbf{Charging Strategy:} From our SOH model, we can conclude that it is unhealthy for SOH to stay too low(less than 20 percents), or too high(more than 80 percents). Therefore, it's essential to set a boundary when charging.
+\end{itemize}
+
+% --- Section 9: Strengths and Limitations ---
+\section{Strengths and Limitations}
+
+\subsection{Strengths}
+\begin{itemize}
+    \item \textbf{Comprehensive Multi-Scale Framework:} Our modeling integrates short-term dynamics (BEM), mid-term user behavior (PRCM), and long-term aging (PACM) into a single unified differential equation.
+    \item \textbf{Strong Physical Interpretability:} Unlike "black-box" machine learning approaches, every parameter in our model has a clear physical meaning, allowing for direct sensitivity analysis and policy recommendations,from the real dynamics.
+    \item \textbf{Dynamic Validation and Prediction:} One of the greatest innovations of our model is the implication of dynamic approach on top of the basic static one. This enables our model to gain a closer fit with the actual data.
+\end{itemize}
+
+\subsection{Limitations}
+\begin{itemize}
+    \item \textbf{Simplification of Internal Resistance:} We treated $R_{\text{int}}$ as a constant. In reality, internal resistance is a function of both SOC and temperature ($R_{\text{int}}(SOC, T)$). This simplification may lead to slight underestimations of voltage drops at extremely low SOC levels ($<5\%$).
+    \item \textbf{Simplification of Circuit:} We selected the OCV as a simple version of the circuit model. But in reality, actual smart phone circuit can contain multiple capacitors, leading to a much more complicated scenario.
+    \item \textbf{Data Approximation:} The validation dataset relies on minute-level sampling. High-frequency power spikes (millisecond-scale) caused by bursting CPU tasks are smoothed out, which might overlook some transient thermal effects on the SEI layer.
+\end{itemize}
+\section{Conclusion}
+
+This study constructs a continuous-time modeling framework to characterize smartphone battery behavior under realistic usage scenarios. Based on an internal-resistance battery model, we establish governing equations describing the evolution of the state of charge (SOC) and develop a system-level power decomposition model that links device usage behavior with battery dynamics. In addition, battery aging effects are incorporated to enable unified modeling of SOC and state of health (SOH), and methods for predicting the remaining time-to-empty (TTE) are proposed within this framework. Overall, this work provides a physically interpretable modeling approach for understanding battery charging, discharging, and degradation mechanisms, and offers theoretical support for battery-aware system design and power management.
+
+
+% ==========================================
+% Part 3: References
+% ==========================================
+\clearpage
+\begin{thebibliography}{99}
+
+\bibitem{Braun2022SOCSOH}
+J.~A.~Braun, R.~Behmann, D.~Schmider, and W.~G.~Bessler,
+``State of charge and state of health diagnosis of batteries with voltage-controlled models,''
+\emph{Journal of Power Sources}, vol.~544, p.~231828, 2022.
+doi:~10.1016/j.jpowsour.2022.231828.
+
+\bibitem{Pathak2012Eprof}
+A.~Pathak, Y.~C.~Hu, and M.~Zhang,
+``Where is the energy spent inside my app? Fine-grained energy accounting on smartphones with Eprof,''
+in \emph{Proceedings of the 7th ACM European Conference on Computer Systems (EuroSys)}, 2012.
+
+\bibitem{Hatchard2001ThermalOvercharge}
+T.~D.~Hatchard, D.~D.~MacNeil, A.~Basu, and J.~R.~Dahn,
+``Thermal model of Li-ion batteries on overcharge,''
+\emph{Journal of The Electrochemical Society}, 2001.
+
+\bibitem{Apple101575}
+Apple Support,
+``About battery health and maximum capacity,'' Support Article 101575.
+Available: \texttt{https://support.apple.com/en-us/101575}. Accessed: 2026-02-01.
+
+\bibitem{Yang2017FastCharging}
+X.-G.~Yang \emph{et al.},
+``Fast charging of lithium-ion batteries at all temperatures,''
+\emph{Nature}, 2017.
+
+\bibitem{Feng2019Inconsistency}
+F.~Feng, X.~Hu, L.~Hu, F.~Hu, Y.~Li, and L.~Zhang,
+``Propagation mechanisms and diagnosis of parameter inconsistency within Li-Ion battery packs,''
+\emph{Renewable and Sustainable Energy Reviews}, vol.~112, pp.~102--113, 2019.
+doi:~10.1016/j.rser.2019.05.042.
+
+\bibitem{Plett2015BMS}
+G.~L.~Plett,
+\emph{Battery Management Systems, Volume I: Battery Modeling}.
+Artech House, 2015.
+
+\bibitem{greenhub}
+The GreenHub Project, ``GreenHub Battery Dataset,'' [Online]. Available: \url{https://greenhubproject.org/dataset}. [Accessed: Feb. 01, 2025].
+\end{thebibliography}
+
+
+% ==========================================
+% Part 4: 附录 (AI 使用报告)
+% ==========================================
+\newpage
+\appendix
+{
+\titleformat*{\section}{\centering\Large\bfseries}
+\section*{Report on Use of AI Tools}
+\addcontentsline{toc}{section}{Report on Use of AI Tools}
+\phantomsection
+\pdfbookmark[1]{Report on Use of AI Tools}{ai-tools}
+}
+
+\vspace{1em}
+
+\noindent
+\textbf{1. Youdao Dictionary (Feb 1, 2025 version, 11.1.2)}  
+
+Used for sentence-level translation and vocabulary checking during English writing.  
+No full-paragraph or full-document translation was performed.
+
+\vspace{0.8em}
+
+\noindent
+\textbf{2. Google Gemini (Nov 18, 2025 version, Gemini 3.0 Pro)}  
+
+\textit{Query:}  
+\textless Summarize the main idea of this picture in the literature in a short paragraph.\textgreater  
+
+\textit{Output:}  
+\textless This figure illustrates that wireless interfaces such as Wi-Fi and 3G operate through multiple discrete power states rather than a simple on--off mode. State transitions are triggered by traffic conditions, queue sizes, and inactivity timers, causing the interface to remain in elevated power states even after data transmission has ceased. As a result, transient bursts of network activity can induce disproportionate energy consumption due to delayed demotion to low-power states.\textgreater
+
+\vspace{0.8em}
+
+\noindent
+\textbf{3. OpenAI ChatGPT (Dec 11, 2025 version, ChatGPT 5.2)}  
+
+\textit{Query:}  
+\textless Help me find a document that tests the power consumption of different components of a mobile phone. Preferably, it should be within the last ten years.\textgreater  
+
+\textit{Output:}  
+\textless This document is specifically designed for testing and quantifying the power consumption of different hardware modules in mobile phones (such as CPU, screen, cellular/Wi-Fi, GPS, etc.), directly measuring the power consumption of each hardware ``power rail''.  
+Gupta et al., 2024. \emph{3 W’s of smartphone power consumption: Who, Where and How much is draining my battery?}  
+This study uses Google's ODPM (On Device Power Rails Monitor) for hardware power-rail-level measurement, enabling attribution of power consumption to modules such as display, cellular/modem, and compute. This provides a strong component-level data source.\textgreater
+\label{LastContentPage}
+
+\end{document}·
