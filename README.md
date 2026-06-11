@@ -10,4 +10,5 @@ The project studies smartphone battery performance, including state of charge (S
 
 - `Final essay.pdf` - Final paper
 - `Source code.txt` - LaTeX source
+- `user_behavior_dataset.csv` - User behavior dataset
 - Images - Figures and model results
